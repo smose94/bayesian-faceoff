@@ -85,3 +85,5 @@ team_ratings_df = pd.DataFrame({
     'Mean Defense Rating': def_mean,
     'Date': dt_time
 })
+
+team_ratings_df.to_csv("data/team_ratings.csv",index=False)
