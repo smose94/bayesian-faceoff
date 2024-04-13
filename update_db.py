@@ -1,13 +1,27 @@
 import subprocess
 import pandas as pd
 from supabase import create_client, Client
-
+import os
 import toml
 
 def load_config():
-    with open("config.toml", "r") as file:
-        config = toml.load(file)
-    return config
+    # Check if environment variables are available
+    supabase_url = os.getenv('SUPABASE_URL')
+    supabase_key = os.getenv('SUPABASE_KEY')
+    
+    if supabase_url and supabase_key:
+        # Return as dictionary if running in environments with environment variables (like GitHub Actions)
+        return {
+            "supabase": {
+                "url": supabase_url,
+                "key": supabase_key
+            }
+        }
+    else:
+        with open("config.toml", "r") as file:
+            config = toml.load(file)
+        return config
+
 
 config = load_config()
 supabase_url = config["supabase"]["url"]
