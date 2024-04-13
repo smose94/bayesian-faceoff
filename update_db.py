@@ -35,7 +35,6 @@ def upload_to_supabase(df, table_name):
     """Upload DataFrame to Supabase table."""
 
     supabase: Client = create_client(supabase_url, supabase_key)
-    supabase.table('countries')
 
     # Query to find the maximum id value
     result = supabase.table("team_strengths").select("id").order("id",desc=True).limit(1).execute()

@@ -11,12 +11,9 @@ import arviz as az
 from model_data import baseline_mcmc, model, mcmc
 teams = pd.read_csv("formatting/teams.csv")
 
-#Set dt_time to today's date
-dt_time = dt.datetime.today().strftime('%Y-%m-%d')
-
 #As this runs at 12:01 GMT, we need to include any games that have the current date as well as
 #they will be played that evening.
-schedule_left = data_hr[data_hr['home_goal'].isna()]
+schedule_left = data_hr[data_hr['home_score'].isna()]
 
 #Define function to use posterior predictions and generate, for each game remaining, 2000 runs of home and away goals
 def sim_schedule_left(schedule_left,mcmc, model):
@@ -43,7 +40,9 @@ def sim_schedule_left(schedule_left,mcmc, model):
 
     except:
         home_goals, away_goals = [],[]
+
     return home_goals, away_goals
+
 
 #Get samples of home_goals and away_goals for each game left
 home_goals, away_goals = sim_schedule_left(schedule_left, mcmc, model)
