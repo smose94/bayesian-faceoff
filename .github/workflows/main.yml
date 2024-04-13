@@ -4,6 +4,7 @@ on:
   schedule:
     # Runs at 12:01 PM UTC
     - cron: '1 12 * * *'
+  workflow_dispatch:
 
 jobs:
   run-python-script:
