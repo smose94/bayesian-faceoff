@@ -10,7 +10,7 @@ def load_config():
     supabase_key = os.getenv('SUPABASE_KEY')
     
     if supabase_url and supabase_key:
-        # Return as dictionary if running in environments with environment variables (like GitHub Actions)
+        # Return as dictionary for GitHub Actions
         return {
             "supabase": {
                 "url": supabase_url,
@@ -37,7 +37,7 @@ def upload_to_supabase(df, table_name):
     supabase: Client = create_client(supabase_url, supabase_key)
 
     # Query to find the maximum id value
-    result = supabase.table("team_strengths").select("id").order("id",desc=True).limit(1).execute()
+    result = supabase.table(table_name).select("id").order("id",desc=True).limit(1).execute()
 
     # Extract the max id value
     max_id = result.data[0]['id'] if result.data else 0
@@ -52,15 +52,20 @@ def upload_to_supabase(df, table_name):
 
 def main():
     # Run your scripts
-    run_script('build_data.py')
-    run_script('model_data.py')
+    #run_script('build_data.py')
+    #run_script('model_data.py')
+    run_script('projections.py')
 
-    # Load the output data (this is just an example, adjust according to your actual data source)
-    df = pd.read_csv('data/team_ratings.csv')
+    # Load the output data 
+    df_ratings = pd.read_csv('data/team_ratings.csv')
 
-    # Assuming your DataFrame 'df' is already formatted to match the 'team_strengths' table schema
-    #print(df)
-    upload_to_supabase(df, 'team_strengths')
+    #Upload team strengths
+    upload_to_supabase(df_ratings, 'team_strengths')
+
+    #Now get df for point projections
+    df_projections = pd.read_csv("data/point_projections.csv")
+    #Now upload point projections
+    upload_to_supabase(df_projections, 'team_points')
 
 if __name__ == "__main__":
     main()

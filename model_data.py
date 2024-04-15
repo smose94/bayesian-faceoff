@@ -15,7 +15,7 @@ import arviz as az
 dt_time = dt.datetime.today().strftime('%Y-%m-%d')
 
 # Filter rows where 'Date' is before dt_time using boolean indexing
-results = data_hr[data_hr['Date'] < dt_time].copy()
+results = data_hr[data_hr['home_score'].notna()].copy()
 
 #Create new column 'days_since' as we'll need it for decay_rate in the model
 results['days_since'] = (results['Date'].max() - results['Date']).dt.days
