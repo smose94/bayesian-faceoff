@@ -96,7 +96,7 @@ def calcPoints(df, team_name):
 
     # Summing all points
     total_points = np.sum(home_wins) + np.sum(home_otl) + np.sum(away_wins) + np.sum(away_otl)
-    return total_points
+    return np.zeros(2000) + total_points
 
 # Calculate and update points for each team
 for team in teams["team"]:
@@ -104,13 +104,13 @@ for team in teams["team"]:
     if team in total_points:
         total_points[team] += current_season_points
     else:
-        total_points[team] = current_season_points
+        total_points[team] = np.zeros(2000) + current_season_points
 
-    if isinstance(total_points[team], np.ndarray):
-        total_points[team] = "[" + ",".join(map(str,total_points[team])) + "]"
-    else:
+    #if isinstance(total_points[team], np.ndarray):
+    total_points[team] = "[" + ",".join(map(str,total_points[team])) + "]"
+    #else:
         # Handle the case where total_points[team] is a single number - end of season only
-        total_points[team] = "[" + str(total_points[team]) + "]"
+        #total_points[team] = "[" + str(total_points[team]) + "]"
 
 #Conversion for storage
 df_points = pd.DataFrame(list(total_points.items()), columns=['team', 'points'])
