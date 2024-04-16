@@ -8,10 +8,7 @@ from predictions import home_goals, away_goals, schedule_left
 from datetime import datetime
 
 teams = pd.read_csv("formatting/teams.csv")
-#schedule_left = pd.read_csv("data/schedule_left.csv")
-#data_archived = np.load('data/arrays.npz')
-#home_goals = data_archived["home_goals"]
-#away_goals = data_archived["away_goals"]
+
 results_current = results[results['Date'] > "2023-10-01"]
 
 
@@ -108,7 +105,13 @@ for team in teams["team"]:
         total_points[team] += current_season_points
     else:
         total_points[team] = current_season_points
-    total_points[team] = "[" + ",".join(map(str, total_points[team])) + "]"
+
+    if isinstance(total_points[team], list):
+        total_points[team] = "[" + ",".join(map(str, total_points[team])) + "]"
+    else:
+        # Handle the case where total_points[team] is a single number (shouldn't occur with the above fix)
+        total_points[team] = "[" + str(total_points[team]) + "]"
+    #total_points[team] = "[" + ",".join(map(str, total_points[team])) + "]"
 
 
 
