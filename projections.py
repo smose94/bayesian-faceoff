@@ -107,13 +107,10 @@ for team in teams["team"]:
         total_points[team] = current_season_points
 
     if isinstance(total_points[team], np.ndarray):
-            total_points[team] +=  current_season_points
+        total_points[team] = "[" + ",".join(map(str,total_points[team])) + "]"
     else:
         # Handle the case where total_points[team] is a single number - end of season only
         total_points[team] = "[" + str(total_points[team]) + "]"
-    #total_points[team] = "[" + ",".join(map(str, total_points[team])) + "]"
-
-
 
 #Conversion for storage
 df_points = pd.DataFrame(list(total_points.items()), columns=['team', 'points'])
