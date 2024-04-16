@@ -106,10 +106,10 @@ for team in teams["team"]:
     else:
         total_points[team] = current_season_points
 
-    if isinstance(total_points[team], list):
-        total_points[team] = "[" + ",".join(map(str, total_points[team])) + "]"
+    if isinstance(total_points[team], np.ndarray):
+            total_points[team] +=  current_season_points
     else:
-        # Handle the case where total_points[team] is a single number (shouldn't occur with the above fix)
+        # Handle the case where total_points[team] is a single number - end of season only
         total_points[team] = "[" + str(total_points[team]) + "]"
     #total_points[team] = "[" + ",".join(map(str, total_points[team])) + "]"
 
