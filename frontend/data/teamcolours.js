@@ -1,7 +1,6 @@
 // teamColours.js
-// Example structure. Adjust it according to your actual file
 const teamColours = {
-    "Anaheim Ducks": "#F47A38", // Example team name and its color
+    "Anaheim Ducks": "#F47A38", 
     "Arizona Coyotes": "#8C2633",
     "Boston Bruins": "#FFB81C",
     "Buffalo Sabres": "#002654",
@@ -33,7 +32,7 @@ const teamColours = {
     "Vegas Golden Knights": "#B4975A", 
     "Washington Capitals": "#C8102E",
     "Winnipeg Jets": "#041E42"
-    // Add all teams and their colors
+
   };
   
   export default teamColours;

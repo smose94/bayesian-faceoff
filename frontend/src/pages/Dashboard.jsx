@@ -16,7 +16,7 @@ export const boxStyles = {
 export default function Dashboard() {
   return (
     <div>
-      <Heading mb={4}>Welcome to Bayesian Faceoff.</Heading>
+      <Heading mb={4}>Welcome to Bayesian Faceoff</Heading>
     </div>
   );
 }

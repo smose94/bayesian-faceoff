@@ -1,0 +1,37 @@
+// teamdivisions.js
+const nhlDivisions = {
+    "Anaheim Ducks": "Pacific",
+    "Arizona Coyotes": "Central",
+    "Boston Bruins": "Atlantic",
+    "Buffalo Sabres": "Atlantic",
+    "Calgary Flames": "Pacific",
+    "Carolina Hurricanes": "Metropolitan",
+    "Chicago Blackhawks": "Central",
+    "Colorado Avalanche": "Central",
+    "Columbus Blue Jackets": "Metropolitan",
+    "Dallas Stars": "Central",
+    "Detroit Red Wings": "Atlantic",
+    "Edmonton Oilers": "Pacific",
+    "Florida Panthers": "Atlantic",
+    "Los Angeles Kings": "Pacific",
+    "Minnesota Wild": "Central",
+    "Montreal Canadiens": "Atlantic",
+    "Nashville Predators": "Central",
+    "New Jersey Devils": "Metropolitan",
+    "New York Islanders": "Metropolitan",
+    "New York Rangers": "Metropolitan",
+    "Ottawa Senators": "Atlantic",
+    "Philadelphia Flyers": "Metropolitan",
+    "Pittsburgh Penguins": "Metropolitan",
+    "San Jose Sharks": "Pacific",
+    "Seattle Kraken": "Pacific",
+    "St. Louis Blues": "Central",
+    "Tampa Bay Lightning": "Atlantic",
+    "Toronto Maple Leafs": "Atlantic",
+    "Vancouver Canucks": "Pacific",
+    "Vegas Golden Knights": "Pacific",
+    "Washington Capitals": "Metropolitan",
+    "Winnipeg Jets": "Central"
+};
+
+export default nhlDivisions;
