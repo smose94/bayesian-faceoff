@@ -88,9 +88,61 @@ export default function Projections() {
         chart.selectAll("rect").data(bins).enter().append("rect").attr("x", 1).attr("transform", d => `translate(${x(d.x0)},${y(d.length)})`).attr("width", d => x(d.x1) - x(d.x0)).attr("height", d => height - y(d.length)).style("fill", teamColour);
     };
 
+    const drawBarChart = (svgRef, teams) => {
+        const svg = d3.select(svgRef);
+        svg.selectAll("*").remove(); // Clear any existing SVG elements
+
+        const margin = { top: 0, right: 10, bottom: 0, left: 120 };
+        const width = 400 - margin.left - margin.right;
+        const height = 200 - margin.top //- margin.bottom;
+
+        const x = d3.scaleLinear()
+            .domain([0, d3.max(teams, d => d.meanPoints)])
+            .range([0, width]);
+
+        const y = d3.scaleBand()
+            .domain(teams.map(d => d.team))
+            .range([0, height])
+            .padding(0.1);
+
+        const chart = svg.append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        chart.append("g").call(d3.axisLeft(y));
+        chart.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+
+        chart.selectAll(".bar").data(teams).enter().append("rect")
+            .attr("class", "bar")
+            .attr("y", d => y(d.team))
+            .attr("height", y.bandwidth())
+            .attr("x", 0)
+            .attr("width", d => x(d.meanPoints))
+            .attr("fill", d => teamColours[d.team]);
+    };
+
     return (
         <Box p={5}>
             {error && <Text color="red.500">{error}</Text>}
+            <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={10}>
+                {Object.entries(groupedData).slice(0, 2).map(([division, teams]) => (
+                    <Box Box key={division} p={2} display="flex" flexDirection="column" justifyContent="center" alignItems="center" boxShadow="0px 4px 6px rgba(0, 0, 0, 0.1)" borderRadius="lg" borderWidth="1px" borderColor="gray.200" height="300px">
+                        <Heading size="md" mb={2}>{division}</Heading>
+                        <svg ref={el => {
+                            if (el) drawBarChart(el, teams.sort((a, b) => b.meanPoints - a.meanPoints));
+                        }} width="400" height="300" />
+                    </Box>
+                ))}
+            </Grid>
+            <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={10}>
+                {Object.entries(groupedData).slice(2, 4).map(([division, teams]) => (
+                    <Box Box key={division} p={2} display="flex" flexDirection="column" justifyContent="center" alignItems="center" boxShadow="0px 4px 6px rgba(0, 0, 0, 0.1)" borderRadius="lg" borderWidth="1px" borderColor="gray.200" height="300px">
+                        <Heading size="md" mb={2}>{division}</Heading>
+                        <svg ref={el => {
+                            if (el) drawBarChart(el, teams.sort((a, b) => b.meanPoints - a.meanPoints));
+                        }} width="400" height="300" />
+                    </Box>
+                ))}
+            </Grid>
             {Object.entries(groupedData).map(([division, teams]) => (
                 <Box key={division}>
                     <Heading size="lg" mb={5}>{division} Division</Heading>
