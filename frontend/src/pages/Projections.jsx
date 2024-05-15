@@ -1,6 +1,6 @@
 import teamColours from '../../data/teamcolours';
 import nhlDivisions from '../../data/teamdivisions';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Box, Text, Grid, Flex, Heading } from '@chakra-ui/react';
 import supabase from '../supabaseClient';
 import * as d3 from 'd3';
@@ -9,6 +9,7 @@ export default function Projections() {
     const [data, setData] = useState([]);
     const [error, setError] = useState('');
     const [groupedData, setGroupedData] = useState({});
+    const tooltipRef = useRef(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,7 +95,7 @@ export default function Projections() {
 
         const margin = { top: 0, right: 10, bottom: 0, left: 120 };
         const width = 400 - margin.left - margin.right;
-        const height = 200 - margin.top //- margin.bottom;
+        const height = 200 - margin.top - margin.bottom;
 
         const x = d3.scaleLinear()
             .domain([0, d3.max(teams, d => d.meanPoints)])
@@ -111,21 +112,36 @@ export default function Projections() {
         chart.append("g").call(d3.axisLeft(y));
         chart.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
 
-        chart.selectAll(".bar").data(teams).enter().append("rect")
+        const bars = chart.selectAll(".bar").data(teams).enter().append("rect")
             .attr("class", "bar")
             .attr("y", d => y(d.team))
             .attr("height", y.bandwidth())
             .attr("x", 0)
             .attr("width", d => x(d.meanPoints))
             .attr("fill", d => teamColours[d.team]);
+
+        // Tooltip
+        bars.on("mouseover", (event, d) => {
+            d3.select(tooltipRef.current)
+                .style("visibility", "visible")
+                .text(`Projected points: ${d.meanPoints.toFixed(1)}`);
+        })
+        .on("mousemove", (event) => {
+            d3.select(tooltipRef.current)
+                .style("top", `${event.pageY - 75}px`)
+                .style("left", `${event.pageX - 200}px`);
+        })
+        .on("mouseout", () => {
+            d3.select(tooltipRef.current).style("visibility", "hidden");
+        });
     };
 
     return (
-        <Box p={5}>
+        <Box p={5} position="relative">
             {error && <Text color="red.500">{error}</Text>}
             <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={10}>
                 {Object.entries(groupedData).slice(0, 2).map(([division, teams]) => (
-                    <Box Box key={division} p={2} display="flex" flexDirection="column" justifyContent="center" alignItems="center" boxShadow="0px 4px 6px rgba(0, 0, 0, 0.1)" borderRadius="lg" borderWidth="1px" borderColor="gray.200" height="300px">
+                    <Box key={division} p={2} display="flex" flexDirection="column" justifyContent="center" alignItems="center" boxShadow="0px 4px 6px rgba(0, 0, 0, 0.1)" borderRadius="lg" borderWidth="1px" borderColor="gray.200" height="300px">
                         <Heading size="md" mb={2}>{division}</Heading>
                         <svg ref={el => {
                             if (el) drawBarChart(el, teams.sort((a, b) => b.meanPoints - a.meanPoints));
@@ -135,7 +151,7 @@ export default function Projections() {
             </Grid>
             <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={10}>
                 {Object.entries(groupedData).slice(2, 4).map(([division, teams]) => (
-                    <Box Box key={division} p={2} display="flex" flexDirection="column" justifyContent="center" alignItems="center" boxShadow="0px 4px 6px rgba(0, 0, 0, 0.1)" borderRadius="lg" borderWidth="1px" borderColor="gray.200" height="300px">
+                    <Box key={division} p={2} display="flex" flexDirection="column" justifyContent="center" alignItems="center" boxShadow="0px 4px 6px rgba(0, 0, 0, 0.1)" borderRadius="lg" borderWidth="1px" borderColor="gray.200" height="300px">
                         <Heading size="md" mb={2}>{division}</Heading>
                         <svg ref={el => {
                             if (el) drawBarChart(el, teams.sort((a, b) => b.meanPoints - a.meanPoints));
@@ -162,6 +178,18 @@ export default function Projections() {
                     </Grid>
                 </Box>
             ))}
+            <div
+                ref={tooltipRef}
+                style={{
+                    position: 'absolute',
+                    visibility: 'hidden',
+                    backgroundColor: 'white',
+                    border: 'solid 1px black',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    pointerEvents: 'none',
+                }}
+            />
         </Box>
     );
 }
