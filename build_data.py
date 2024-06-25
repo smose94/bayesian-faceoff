@@ -15,7 +15,7 @@ for year in range(2022, 2025):  # Loop from 2022 to 2024 inclusive
     df_year = data_year[0]
     
     # Renaming 'Unnamed: 5' to 'Shootout'
-    df_year = df_year.rename(columns={'Unnamed: 5': 'Shootout'})
+    df_year = df_year.rename(columns={'Unnamed: 6': 'Shootout'})
     
     # Adding a column for the season year
     df_year['Season'] = year
