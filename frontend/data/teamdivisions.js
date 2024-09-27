@@ -1,7 +1,6 @@
 // teamdivisions.js
 const nhlDivisions = {
     "Anaheim Ducks": "Pacific",
-    "Arizona Coyotes": "Central",
     "Boston Bruins": "Atlantic",
     "Buffalo Sabres": "Atlantic",
     "Calgary Flames": "Pacific",
@@ -28,6 +27,7 @@ const nhlDivisions = {
     "St. Louis Blues": "Central",
     "Tampa Bay Lightning": "Atlantic",
     "Toronto Maple Leafs": "Atlantic",
+    "Utah Hockey Club": "Central",
     "Vancouver Canucks": "Pacific",
     "Vegas Golden Knights": "Pacific",
     "Washington Capitals": "Metropolitan",

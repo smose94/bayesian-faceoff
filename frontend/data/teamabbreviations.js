@@ -2,7 +2,6 @@
 // Example structure. Adjust it according to your actual file
 const teamAbbr = {
     "Anaheim Ducks": "ANA", // Example team name and its color
-    "Arizona Coyotes": "ARI",
     "Boston Bruins": "BOS",
     "Buffalo Sabres": "BUF",
     "Calgary Flames": "CGY",
@@ -29,6 +28,7 @@ const teamAbbr = {
     "St. Louis Blues": "STL",
     "Tampa Bay Lightning": "TBL",
     "Toronto Maple Leafs":"TOR",
+    "Utah Hockey Club": "UTA",
     "Vancouver Canucks": "VAN",
     "Vegas Golden Knights": "VGK", 
     "Washington Capitals": "WSH",

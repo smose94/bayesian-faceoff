@@ -7,7 +7,7 @@ teams = pd.read_csv("formatting/teams.csv")
 # Initialize an empty DataFrame to store all data
 data_hr = pd.DataFrame()
 
-for year in range(2022, 2025):  # Loop from 2022 to 2024 inclusive
+for year in range(2022, 2026):  # Loop from 2022 to 2025 inclusive
     url = f'https://www.hockey-reference.com/leagues/NHL_{year}_games.html'
     data_year = pd.read_html(url)
     
@@ -29,6 +29,11 @@ data_hr['Date'] = pd.to_datetime(data_hr['Date'])
 # Creating 'home_score' and 'away_score' columns
 data_hr['home_score'] = data_hr['G.1']
 data_hr['away_score'] = data_hr['G']
+
+#Replace Arizona with Utah
+data_hr['Home'] = data_hr['Home'].replace('Arizona Coyotes', 'Utah Hockey Club')
+data_hr['Visitor'] = data_hr['Visitor'].replace('Arizona Coyotes', 'Utah Hockey Club')
+
 
 # Adjusting scores based on 'Shootout'
 # Loop through each row to check for shootout condition and adjust scores
@@ -53,7 +58,5 @@ data_hr = (
     .rename(columns={"team_index": "away_ix"})
     .drop(["team"], axis=1)
 )
-
-
 
 
