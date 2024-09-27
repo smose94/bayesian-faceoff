@@ -1,7 +1,6 @@
 // teamColours.js
 const teamColours = {
     "Anaheim Ducks": "#F47A38", 
-    "Arizona Coyotes": "#8C2633",
     "Boston Bruins": "#FFB81C",
     "Buffalo Sabres": "#002654",
     "Calgary Flames": "#C8102E",
@@ -28,6 +27,7 @@ const teamColours = {
     "St. Louis Blues": "#001628",
     "Tampa Bay Lightning": "#002868",
     "Toronto Maple Leafs":"#00205B",
+    "Utah Hockey Club": "#71AFE5",
     "Vancouver Canucks": "#00205B",
     "Vegas Golden Knights": "#B4975A", 
     "Washington Capitals": "#C8102E",

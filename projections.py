@@ -1,101 +1,82 @@
-#Read in packages
 import pandas as pd
-import datetime as dt
 import numpy as np
-import arviz as az
+import datetime as dt
+from datetime import datetime
 from model_data import results
 from predictions import home_goals, away_goals, schedule_left
-from datetime import datetime
+import arviz as az
 
+# Read in teams data
 teams = pd.read_csv("formatting/teams.csv")
 
-results_current = results[results['Date'] > "2023-10-01"]
+# Filter for current season results
+results_current = results[results['Date'] > "2024-10-01"]
 
-
-#Next we need to sort out poi
+# Optimized simResults function using vectorized operations
 def simResults(schedule, homeGoals, awayGoals, teams):
+    # Initialize dictionaries for home and away points
+    home_dict = {team: [] for team in teams['team']}
+    away_dict = {team: [] for team in teams['team']}
 
+    # Iterate over the schedule
+    for i, row in schedule.iterrows():
+        home_team = row['Home']
+        away_team = row['Visitor']
 
+        # Determine points based on goals using vectorized operations
+        home_points = np.where(homeGoals[i] > awayGoals[i], 2, 
+                       np.where(homeGoals[i] < awayGoals[i], 0, 1))
+        away_points = np.where(homeGoals[i] < homeGoals[i], 2, 
+                       np.where(homeGoals[i] > awayGoals[i], 0, 1))
 
-    home_dict = dict.fromkeys(teams['team'])
-    away_dict = dict.fromkeys(teams['team'])
-    
-    for team in teams['team']:
-        home_dict[team] = []
-        away_dict[team] = []
+        # Handle shootouts/overtimes in vectorized way
+        draws = (homeGoals[i] == awayGoals[i])
+        random_vals = np.random.uniform(low=0, high=1, size=homeGoals.shape[1])
 
-    for i in range(len(schedule)):
-        home_team = schedule.iloc[i]['Home']
-        away_team = schedule.iloc[i]['Visitor']
-        
-        homePoints = np.zeros(homeGoals.shape[1])
-        awayPoints = np.zeros(awayGoals.shape[1])
+        # Determine if it's a shootout or overtime
+        shootout_mask = (draws & (random_vals < 0.344))
+        overtime_mask = (draws & ~shootout_mask)
 
-        for j in range(homeGoals.shape[1]):
+        shootout_winners = np.random.uniform(low=0, high=1, size=homeGoals.shape[1]) < 0.5
+        home_points[shootout_mask] += shootout_winners * 1
+        away_points[shootout_mask] += ~shootout_winners * 1
 
-            if homeGoals[i][j] > awayGoals[i][j]:
-                homePoints[j] = 2
-            elif homeGoals[i][j] < awayGoals[i][j]:
-                awayPoints[j] = 2
-            else:  # This implies a draw
-                homePoints[j] = 1
-                awayPoints[j] = 1
-                # Now, determine SO or OT
-                if np.random.uniform(low=0, high=1) < 0.344:  # Chance of going to shootout
-                    note = 'SO'
-                    if np.random.uniform(low=0, high=1) < 0.5:
-                        homePoints[j] = 2  # Home wins in shootout
-                        awayPoints[j] = 1
-                    else:
-                        homePoints[j] = 1
-                        awayPoints[j] = 2  # Away wins in shootout
-                else:
-                    note = 'OT'
-                    if np.random.uniform(low=0, high=1) < 0.5:
-                        homePoints[j] = 2  # Home wins in overtime
-                        awayPoints[j] = 1
-                    else:
-                        homePoints[j] = 1
-                        awayPoints[j] = 2  # Away wins in overtime
+        overtime_winners = np.random.uniform(low=0, high=1, size=homeGoals.shape[1]) < 0.5
+        home_points[overtime_mask] += overtime_winners * 1
+        away_points[overtime_mask] += ~overtime_winners * 1
 
-
-
-        home_dict[home_team].append(homePoints)
-        away_dict[away_team].append(awayPoints)
+        # Append points for home and away teams
+        home_dict[home_team].append(home_points)
+        away_dict[away_team].append(away_points)
 
     return home_dict, away_dict
 
+# Simulate results and calculate points
 home_dict, away_dict = simResults(schedule_left, home_goals, away_goals, teams)
 
+# Optimized summing of points using np.vstack
 for key in home_dict:
-    home_dict[key] = np.array(home_dict[key]).sum(axis=0)
-    away_dict[key] = np.array(away_dict[key]).sum(axis=0)
+    home_dict[key] = np.sum(np.vstack(home_dict[key]), axis=0)
+    away_dict[key] = np.sum(np.vstack(away_dict[key]), axis=0)
 
+# Combine home and away points into total_points
+total_points = {key: home_dict[key] + away_dict[key] for key in home_dict}
 
-# Now, combine the results into a single dictionary
-total_points = {}
-for key in home_dict:
-    # This will add the points from home and away matches
-    # It assumes all keys in home_dict are also in away_dict
-    total_points[key] = home_dict[key] + away_dict[key]
-
-import numpy as np
-
+# Optimized calcPoints function
 def calcPoints(df, team_name):
-    # Filter data once per team (more efficient than twice if data is large)
+    # Filter once for home and away matches
     is_home = df['Home'] == team_name
     is_away = df['Visitor'] == team_name
 
-    # Home team points calculation
-    home_wins = np.where((is_home) & (df['G.1'] > df['G']), 2, 0)
-    home_otl = np.where((is_home) & (df['G.1'] < df['G']) & (df['Shootout'].notna()), 1, 0)
-
-    # Away team points calculation
-    away_wins = np.where((is_away) & (df['G'] > df['G.1']), 2, 0)
-    away_otl = np.where((is_away) & (df['G'] < df['G.1']) & (df['Shootout'].notna()), 1, 0)
-
-    # Summing all points
-    total_points = np.sum(home_wins) + np.sum(home_otl) + np.sum(away_wins) + np.sum(away_otl)
+    # Use np.select for points calculation in a single step
+    home_wins = np.select([is_home & (df['G.1'] > df['G'])], [2], default=0)
+    home_otl = np.select([is_home & (df['G.1'] < df['G']) & df['Shootout'].notna()], [1], default=0)
+    
+    away_wins = np.select([is_away & (df['G'] > df['G.1'])], [2], default=0)
+    away_otl = np.select([is_away & (df['G'] < df['G.1']) & df['Shootout'].notna()], [1], default=0)
+    
+    # Sum all points
+    total_points = home_wins.sum() + home_otl.sum() + away_wins.sum() + away_otl.sum()
     return np.zeros(2000) + total_points
 
 # Calculate and update points for each team
@@ -106,17 +87,14 @@ for team in teams["team"]:
     else:
         total_points[team] = np.zeros(2000) + current_season_points
 
-    #if isinstance(total_points[team], np.ndarray):
-    total_points[team] = "[" + ",".join(map(str,total_points[team])) + "]"
-    #else:
-        # Handle the case where total_points[team] is a single number - end of season only
-        #total_points[team] = "[" + str(total_points[team]) + "]"
+    # Convert to string format for storage
+    total_points[team] = "[" + ",".join(map(str, total_points[team])) + "]"
 
-#Conversion for storage
+# Conversion for storage
 df_points = pd.DataFrame(list(total_points.items()), columns=['team', 'points'])
 
 # Add a date column with today's date
 df_points['date'] = datetime.today().strftime('%Y-%m-%d')
 
-
-df_points.to_csv("data/point_projections.csv", index=False)
+# Export the points to CSV
+df_points.to_csv("data/point_projections_vector.csv", index=False)
