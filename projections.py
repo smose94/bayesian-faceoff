@@ -119,4 +119,4 @@ df_points = pd.DataFrame(list(total_points.items()), columns=['team', 'points'])
 df_points['date'] = datetime.today().strftime('%Y-%m-%d')
 
 
-#df_points.to_csv("data/point_projections.csv", index=False)
+df_points.to_csv("data/point_projections.csv", index=False)
