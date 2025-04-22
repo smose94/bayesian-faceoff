@@ -218,10 +218,10 @@ def main():
     
     # Save latest standings to a separate CSV for reference
     latest_standings.to_csv("data/team_stats_latest.csv", index=False)
-    latest_standings = pd.read_csv("data/team_stats_latest.csv")
+    latest_standings_csv = pd.read_csv("data/team_stats_latest.csv")
     
     # Upload only the latest standings (32 records) to Supabase
-    upload_to_supabase(latest_standings, 'team_standings')
+    upload_to_supabase(latest_standings_csv, 'team_standings')
 
     # Load the output data 
     df_ratings = pd.read_csv('data/team_ratings.csv')
